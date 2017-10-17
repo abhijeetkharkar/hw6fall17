@@ -49,19 +49,33 @@ describe MoviesController do
     end
     describe 'not selecting movies' do
       it 'should be redirected to the index page' do
-      post :add_tmdb, {}
-      expect(response).to redirect_to '/movies'
-      expect(flash[:notice]).to eq 'No movies selected'
+        post :add_tmdb, {}
+        expect(response).to redirect_to '/movies'
+        expect(flash[:notice]).to eq 'No movies selected'
+      end
     end
-    end
-  end
-  describe 'show index' do
-    
   end
   describe 'new movie' do
-    it 'should render a new template to add movie' do
+    it 'should render a template to add movie' do
       get :new
       expect(response).to render_template('new')
     end
   end
+  describe 'edit movie' do
+    it 'should render a template to edit a movie' do
+      fake_results = [double('movie1'), double('movie2')]
+      allow(Movie).to receive(:find).with('1').and_return (fake_results)
+      get :edit, {:id => 1}
+      expect(response).to render_template('edit')
+    end
+  end
+  #describe 'delete movie' do
+  #  it 'should delete the movie and redirect to the index page' do
+  #    fake_results = double('movie1')
+  #    expect(Movie).to receive(:find).with('1').and_return (fake_results)
+  #    delete :destroy, {:id => 1}
+  #    expect(response).to redirect_to '/movies'
+  #    expect(flash[:notice]).to eq 'Movie movie1 deleted'
+  #  end
+  #end
 end
