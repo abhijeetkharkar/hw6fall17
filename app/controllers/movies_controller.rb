@@ -11,6 +11,7 @@ class MoviesController < ApplicationController
   end
   
   def index
+    print "Params for Index = #{params}"
     sort = params[:sort] || session[:sort]
     case sort
     when 'title'
@@ -62,7 +63,44 @@ class MoviesController < ApplicationController
   end
   
   def search_tmdb
-    @movies=Movie.find_in_tmdb(params[:search_terms])
+    puts "Params = #{params}"
+    @search_string = params[:search_terms]
+    if @search_string.empty?
+      puts "Search term is empty"
+      flash[:notice] = "Invalid search term"
+      redirect_to movies_path
+    else
+      @movies=Movie.find_in_tmdb(@search_string)
+      puts "@movies = #{@movies}"
+      if @movies == nil || @movies.count == 0
+        flash[:notice] = "No matching movies were found on TMDb"
+        redirect_to movies_path
+      else
+        return @movies
+      end
+    end
+  end
+  
+  def add_tmdb
+    puts "Params = #{params}"
+    #params["tmdb_movies"].each do |selected_movie|
+    #  puts "Selected Movie ID = "
+    #end
+    
+    if params[:tmdb_movies] == nil
+      flash[:notice] = "No movies selected"
+      redirect_to movies_path
+    else
+      tmdb_ids = params[:tmdb_movies].keys
+      tmdb_ids.each do |tmdb_id|
+        Movie.create_from_tmdb(tmdb_id)
+      end
+      flash[:notice] = "Movies successfully added to Rotten Potatoes"
+      redirect_to movies_path
+    end
+    
+    #@movies=Movie.find_in_tmdb(params[:movie][:search_terms])
+    #puts "@movies = #{@movies}"
   end
 
 end
