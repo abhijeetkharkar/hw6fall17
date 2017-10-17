@@ -13,8 +13,15 @@ class Movie < ActiveRecord::Base
     movie_hash = {:title => details["title"], :release_date => details["release_date"], :description => details["overview"]}
     ratings.each do |country_rating| 
       if country_rating["iso_3166_1"] == "US"
-        movie_hash[:rating] = country_rating["certification"]
+        if country_rating["certification"] == ""
+          movie_hash[:rating] = "NR"
+        else
+          movie_hash[:rating] = country_rating["certification"]
+        end
         break
+      end
+      if movie_hash[:rating] == nil
+          movie_hash[:rating] = "NR"
       end
     end
     Movie.create(movie_hash)
